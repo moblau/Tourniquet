@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="egPzza" name="Tourniquet" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1"
+              pluginCharacteristicsValue="pluginWantsMidiIn" companyName="Luluby Labs">
+  <MAINGROUP id="y66hSo" name="Tourniquet">
+    <GROUP id="{134BFE89-178C-28A8-542C-FDA312374FA8}" name="graphics">
+      <FILE id="UYrTIL" name="bg.png" compile="0" resource="1" file="graphics/bg.png"/>
+      <FILE id="bITM5Y" name="bg.psd" compile="0" resource="1" file="graphics/bg.psd"/>
+      <FILE id="dNw3C5" name="bg2.psd" compile="0" resource="1" file="graphics/bg2.psd"/>
+      <FILE id="UxWfif" name="luluby.png" compile="0" resource="1" file="graphics/luluby.png"/>
+      <FILE id="o5DQ07" name="tourniquet.png" compile="0" resource="1" file="graphics/tourniquet.png"/>
+      <FILE id="Y1Ku9o" name="tourniquet.psd" compile="0" resource="1" file="graphics/tourniquet.psd"/>
+      <FILE id="QKXaNE" name="tourniquet2.png" compile="0" resource="1" file="graphics/tourniquet2.png"/>
+    </GROUP>
+    <GROUP id="{2E4C336B-62E2-F877-6DAD-DE41B6C4E4B7}" name="Source">
+      <FILE id="XIayz6" name="VerticalLabel.h" compile="0" resource="0" file="Source/VerticalLabel.h"/>
+      <FILE id="vmnrt2" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="D0Mthj" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="sFo7dM" name="CustomSliderLookAndFeel.cpp" compile="1" resource="0"
+            file="../SVerb/Source/CustomSliderLookAndFeel.cpp"/>
+      <FILE id="uvhjsX" name="CustomSliderLookAndFeel.h" compile="0" resource="0"
+            file="../SVerb/Source/CustomSliderLookAndFeel.h"/>
+      <FILE id="wo4JnA" name="Distortion.cpp" compile="1" resource="0" file="../SVerb/Source/Distortion.cpp"/>
+      <FILE id="FGJdrg" name="Distortion.h" compile="0" resource="0" file="../SVerb/Source/Distortion.h"/>
+      <FILE id="fMkBQ9" name="Filter.cpp" compile="1" resource="0" file="../SVerb/Source/Filter.cpp"/>
+      <FILE id="zdy7Pk" name="Filter.h" compile="0" resource="0" file="../SVerb/Source/Filter.h"/>
+      <FILE id="pVNixZ" name="SVerb.cpp" compile="1" resource="0" file="../SVerb/Source/SVerb.cpp"/>
+      <FILE id="ygRAti" name="SVerb.h" compile="0" resource="0" file="../SVerb/Source/SVerb.h"/>
+      <FILE id="xrdy3R" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="jPat2n" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Tourniquet"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Tourniquet"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
