@@ -8,14 +8,17 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-
 //==============================================================================
 TourniquetAudioProcessorEditor::TourniquetAudioProcessorEditor (TourniquetAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p), customSliderLookAndFeel(p.getAPVTS())
 {
-    setSize (512, 512);
-    startTimer(.01);
+    setSize (712, 512);
+    startTimer(24);
     
+    addAndMakeVisible(inLeftMeter);
+    addAndMakeVisible(inRightMeter);
+    addAndMakeVisible(outLeftMeter);
+    addAndMakeVisible(outRightMeter);
     
     signalOrder.setLookAndFeel(&customSliderLookAndFeel);
     addAndMakeVisible(signalOrder);
@@ -24,7 +27,6 @@ TourniquetAudioProcessorEditor::TourniquetAudioProcessorEditor (TourniquetAudioP
     filterOrder.setLookAndFeel(&customSliderLookAndFeel);
     addAndMakeVisible(filterOrder);
     filterOrderAttachment.reset(new juce::AudioProcessorValueTreeState::ButtonAttachment(audioProcessor.getAPVTS(), "filterOrder", filterOrder));
-    
     
     delayKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     delayKnob.setLookAndFeel(&customSliderLookAndFeel);
@@ -119,7 +121,6 @@ TourniquetAudioProcessorEditor::TourniquetAudioProcessorEditor (TourniquetAudioP
     addAndMakeVisible(hpfEnvKnob);
     hpfEnvAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "hpfEnv", hpfEnvKnob));
     
-    
     lpfSkewKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
     lpfSkewKnob.setLookAndFeel(&customSliderLookAndFeel);
     lpfSkewKnob.setSliderStyle(juce::Slider::RotaryVerticalDrag);
@@ -137,8 +138,6 @@ TourniquetAudioProcessorEditor::TourniquetAudioProcessorEditor (TourniquetAudioP
     hpfSkewKnob.setValue(1);
     addAndMakeVisible(hpfSkewKnob);
     hpfSkewAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "hpfSkew", hpfSkewKnob));
-    
-    
     
     lpfEnvAttackKnob.setSliderStyle(juce::Slider::LinearHorizontal);
 
@@ -179,6 +178,24 @@ TourniquetAudioProcessorEditor::TourniquetAudioProcessorEditor (TourniquetAudioP
     addAndMakeVisible(hpfEnvReleaseKnob);
     hpfEnvReleaseAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "hpfEnvRelease", hpfEnvReleaseKnob));
     
+    inputGainSlider.setSliderStyle(juce::Slider::LinearVertical);
+
+    inputGainSlider.setLookAndFeel(&customSliderLookAndFeel);
+    inputGainSlider.setComponentID("gainSlider");
+    inputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 20);
+    inputGainSlider.setRange(0.0,1.0,0.0);
+    inputGainSlider.setValue(1.0);
+    addAndMakeVisible(inputGainSlider);
+    inputGainAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "inputGain", inputGainSlider));
+    
+    outputGainSlider.setLookAndFeel(&customSliderLookAndFeel);
+    outputGainSlider.setComponentID("gainSlider");
+    outputGainSlider.setSliderStyle(juce::Slider::LinearVertical);
+    outputGainSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 50, 20);
+    outputGainSlider.setRange(0.0,1.0,0.0);
+    outputGainSlider.setValue(1.0);
+    addAndMakeVisible(outputGainSlider);
+    outputGainAttachment.reset(new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.getAPVTS(), "outputGain", outputGainSlider));
     
     decayTimeLabel.setText("Decay Time", juce::dontSendNotification);
     decayTimeLabel.setJustificationType(juce::Justification::centred);
@@ -233,6 +250,14 @@ TourniquetAudioProcessorEditor::TourniquetAudioProcessorEditor (TourniquetAudioP
     arLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(arLabel);
     
+    inputLabel.setText("Input", juce::dontSendNotification);
+    inputLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(inputLabel);
+    
+    outputLabel.setText("Output", juce::dontSendNotification);
+    outputLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(outputLabel);
+    
     filterOrderLabel.setText("Rev          Dist", juce::dontSendNotification);
     filterOrderLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(filterOrderLabel);
@@ -272,6 +297,8 @@ TourniquetAudioProcessorEditor::~TourniquetAudioProcessorEditor()
     hpfEnvKnob.setLookAndFeel(nullptr);
     lpfSkewKnob.setLookAndFeel(nullptr);
     hpfSkewKnob.setLookAndFeel(nullptr);
+    inputGainSlider.setLookAndFeel(nullptr);
+    outputGainSlider.setLookAndFeel(nullptr);
 
 }
 
@@ -281,33 +308,61 @@ void TourniquetAudioProcessorEditor::timerCallback()
     hpfDeltaFreq = audioProcessor.hpfDelta.load();
     customSliderLookAndFeel.setDelta(lpfDeltaFreq, hpfDeltaFreq);
     repaint();
+
+    inLeftMeter.setLevel(audioProcessor.getRMS(0,0));
+    inRightMeter.setLevel(audioProcessor.getRMS(1,0));
+    
+    outLeftMeter.setLevel(audioProcessor.getRMS(0,1));
+    outRightMeter.setLevel(audioProcessor.getRMS(0,1));
+    
+    inLeftMeter.setClipping(audioProcessor.getClipStatus(0,0));
+    inRightMeter.setClipping(audioProcessor.getClipStatus(1,0));
+    
+    outLeftMeter.setClipping(audioProcessor.getClipStatus(0,1));
+    outRightMeter.setClipping(audioProcessor.getClipStatus(1,1));
+    
+    inLeftMeter.repaint();
+    inRightMeter.repaint();
+    
+    outLeftMeter.repaint();
+    outRightMeter.repaint();
 }
 //==============================================================================
 void TourniquetAudioProcessorEditor::paint (juce::Graphics& g)
 {
     juce::Rectangle<int> bounds = getLocalBounds();
     bg = juce::ImageCache::getFromMemory(BinaryData::bg_png, BinaryData::bg_pngSize  );
-    g.drawImageWithin(bg, 0, 0, 512 , 512, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(bg, 100, 0, 512 , 512, juce::RectanglePlacement::stretchToFit);
     juce::ColourGradient gradient (juce::Colours::darkblue, bounds.getX(), bounds.getY(),
                                    juce::Colours::darkgrey, bounds.getX(), bounds.getBottom(), false);
     gradient.multiplyOpacity(.17);
     g.setGradientFill(gradient);
-    g.fillRect(bounds);  // Fill the entire component with the gradient
+    g.fillRect(bounds);
     title = juce::ImageCache::getFromMemory(BinaryData::tourniquet_png, BinaryData::tourniquet_pngSize  );
-    g.drawImageWithin(title, 30, 0, 512 , 256, juce::RectanglePlacement::stretchToFit);
+    g.drawImageWithin(title, 130, 0, 512 , 256, juce::RectanglePlacement::stretchToFit);
     lulubyLogo = juce::ImageCache::getFromMemory(BinaryData::luluby_png, BinaryData::luluby_pngSize  );
-    g.drawImageWithin(lulubyLogo, 70, 25, 70 , 70, juce::RectanglePlacement::stretchToFit);
-
-    
+    g.drawImageWithin(lulubyLogo, 170, 25, 70 , 70, juce::RectanglePlacement::stretchToFit);
 }
 
 void TourniquetAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
+    auto inMeter = bounds.removeFromLeft(100).reduced(10, 75);
+    auto outMeter = bounds.removeFromRight(100).reduced(10,75);
+    int barWidth = 30;
+    inputLabel.setBounds(14,440,50,30);
+    outputLabel.setBounds(627,440,50,30);
+
+    outLeftMeter.setBounds(outMeter.removeFromLeft(barWidth));
+    outRightMeter.setBounds(outMeter.removeFromLeft(barWidth));
+    outputGainSlider.setBounds(outMeter);
+    inLeftMeter.setBounds(inMeter.removeFromLeft(barWidth));
+    inRightMeter.setBounds(inMeter.removeFromLeft(barWidth));
+    inputGainSlider.setBounds(inMeter);
     bounds = bounds.reduced(15,15);
     auto topRatio = bounds.getWidth()/3;
     auto bottom = bounds.removeFromBottom(bounds.getHeight()/2);
-    auto top = bounds.removeFromTop(topRatio/2);
+    bounds.removeFromTop(80);
     auto leftArea = bounds.removeFromLeft(topRatio);
     auto decayTimeArea = leftArea.removeFromBottom(25);
     auto midArea = bounds.removeFromLeft(topRatio);
@@ -315,23 +370,13 @@ void TourniquetAudioProcessorEditor::resized()
     auto spreadArea = midArea.removeFromBottom(25);
     auto distortionArea = rightArea.removeFromBottom(25);
     
-//    for(int i = 0; i < 3; i ++){
-//        auto leftTopArea = topArea.withTrimmedLeft(i * topArea.getWidth()/3).withWidth(topArea.getWidth()/3);
-//        allPassDelaySlider[i].setBounds(leftTopArea);
-//
-//    }
-    
     delayKnob.setBounds(leftArea.reduced(7));
     decayTimeLabel.setBounds(decayTimeArea);
     feedbackKnob.setBounds(midArea.reduced(7));
     spreadLabel.setBounds(spreadArea);
     distortionKnob.setBounds(rightArea.reduced(7));
     distortionLabel.setBounds(distortionArea);
-//    auto freqGainBounds = bottom.removeFromTop(bottom.getHeight()/3);
-//    auto w = freqGainBounds.getWidth()/3;
-//    freqGainKnob.setBounds(freqGainBounds.removeFromLeft(w));
-//    freqQKnob.setBounds(freqGainBounds.removeFromLeft(w));
-//    ratioKnob.setBounds(freqGainBounds);
+
     float bottomRatio = bottom.getWidth()/3;
     auto topLowpass = bottom.removeFromLeft(bottomRatio);
     auto lpLabelArea = topLowpass.removeFromBottom(25);
@@ -343,8 +388,7 @@ void TourniquetAudioProcessorEditor::resized()
     hpfSkewKnob.setBounds(hpfEnvArea.reduced(7));
     highPassKnob.setBounds(topLowpass.removeFromTop(40));
     auto arKnobArea = topLowpass.removeFromTop(70);
-//    envGainLabel.setBounds(160,270,70,20);
-//    skewLabel.setBounds(160,290,70,20);
+
     hpfEnvAttackKnob.setBounds(arKnobArea.removeFromLeft(arKnobArea.getWidth()/2));
     hpfEnvReleaseKnob.setBounds(arKnobArea);
     highPassQKnob.setBounds(topLowpass);
@@ -371,20 +415,16 @@ void TourniquetAudioProcessorEditor::resized()
     lpfEnvAttackKnob.setBounds(arKnobArea.removeFromLeft(arKnobArea.getWidth()/2));
     lpfEnvReleaseKnob.setBounds(arKnobArea);
     
-    
     lowPassQKnob.setBounds(topHighPass);
     auto dryWetArea = bottom.removeFromLeft(bottomRatio);
     
     auto distTypeArea = dryWetArea.removeFromTop(60).reduced(15);
     distortionType.setBounds(distTypeArea);
-    signalOrderLabel.setBounds(386,365,100,20);
-    filterOrderLabel.setBounds(388,325,100,20);
+    signalOrderLabel.setBounds(486,365,100,20);
+    filterOrderLabel.setBounds(488,325,100,20);
     signalOrder.setBounds(dryWetArea.removeFromTop(40));
     filterOrder.setBounds(dryWetArea.removeFromTop(40));
     dryWetKnob.setBounds(dryWetArea.removeFromTop(70).reduced(7));
     dryWetLabel.setBounds(dryWetArea);
-//    arLabel.setBounds(330,382,50,20);
-//    qLabel.setBounds(325, 440, 50, 20);
-//    freqLabel.setBounds(330,330,50,20);
 }
 

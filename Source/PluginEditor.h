@@ -12,6 +12,8 @@
 #include "PluginProcessor.h"
 #include "CustomSliderLookAndFeel.h"
 #include "VerticalLabel.h"
+#include "Meter.h"
+
 //==============================================================================
 /**
 */
@@ -35,10 +37,12 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     TourniquetAudioProcessor& audioProcessor;
+
+    Meter inLeftMeter,inRightMeter, outLeftMeter, outRightMeter;
+    
     juce::Image title, lulubyLogo, bg;
+    
     juce::Slider delayKnob;
     juce::Slider feedbackKnob;
     juce::Slider distortionKnob;
@@ -47,19 +51,18 @@ private:
     juce::Slider dryWetKnob;
     juce::Slider lowPassQKnob;
     juce::Slider highPassQKnob;
-    juce::ToggleButton signalOrder, filterOrder;
-    juce::ComboBox distortionType;
     juce::Slider lpfEnvKnob, hpfEnvKnob;
     juce::Slider lpfEnvAttackKnob, lpfEnvReleaseKnob, hpfEnvAttackKnob, hpfEnvReleaseKnob;
     juce::Slider lpfSkewKnob, hpfSkewKnob;
+    juce::Slider inputGainSlider, outputGainSlider;
     
+    juce::ToggleButton signalOrder, filterOrder;
     
+    juce::ComboBox distortionType;
     
     float hpfDeltaFreq, lpfDeltaFreq;
     float lpfFreq, hpfFreq;
-//    juce::Slider freqGainKnob;
-//    juce::Slider freqQKnob;
-//    juce::Slider ratioKnob;
+
     CustomSliderLookAndFeel customSliderLookAndFeel;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> signalOrderAttachment, filterOrderAttachment;
@@ -72,8 +75,6 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> dryWetAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lowPassQAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> highPassQAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> distortionTypeAttachment;
-    
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lpfEnvAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hpfEnvAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lpfEnvAttackAttachment;
@@ -81,11 +82,15 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hpfEnvAttackAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> hpfEnvReleaseAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lpfSkewAttachment, hpfSkewAttachment;
-
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> inputGainAttachment, outputGainAttachment;
     
-    juce::Label decayTimeLabel, spreadLabel, distortionLabel, dryWetLabel, hpLabel, qLabel, freqLabel, lpLabel,  signalOrderLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> distortionTypeAttachment;
+    
+    juce::Label decayTimeLabel, spreadLabel, distortionLabel, dryWetLabel, hpLabel, qLabel, freqLabel, lpLabel,  signalOrderLabel, inputLabel, outputLabel;
     juce::Label  arLabel, filterOrderLabel;
+    
     VerticalLabel skewLabel, envGainLabel, skewLabel2, envGainLabel2;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TourniquetAudioProcessorEditor)
 };
 

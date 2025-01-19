@@ -56,8 +56,64 @@ public:
     juce::AudioProcessorValueTreeState& getAPVTS();
     
     void handleMidi(juce::MidiBuffer& midiMessages);
+    
     std::atomic<float> lpfDelta, hpfDelta, lpfFreq, hpfFreq;
+    
+    float getRMS(int channel, int inSelect)
+    {
+        if ( inSelect == 0){
+            if (channel == 0)
+            {
+                return inRMSLeft;
+            }
+            else
+            {
+                return inRMSRight;
+            }
+        }
+        else{
+            if (channel == 0)
+            {
+                return outRMSLeft;
+            }
+            else
+            {
+                return outRMSRight;
+            }
+        }
+        
+    }
+    
+    bool getClipStatus(int channel, int inSelect){
+        if (inSelect == 0){
+            if (channel == 0)
+            {
+                return inLeftClip;
+            }
+            else
+            {
+                return inRightClip;
+            }
+        }
+        else{
+            if (channel == 0)
+            {
+                return outLeftClip;
+            }
+            else
+            {
+                return outRightClip;
+            }
+        }
+    }
+ 
+    
+
 private:
+    bool inLeftClip, inRightClip, outLeftClip,outRightClip;
+    
+    float inRMSLeft, inRMSRight, outRMSLeft, outRMSRight;
+    
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
     
     std::atomic<float> * delayTime;
@@ -71,12 +127,12 @@ private:
     
     juce::dsp::DryWetMixer<float> dryWet;
     
-//    int notesOn[4] {-1,-1,-1,-1};
-
+    juce::dsp::Gain<float> inputGain, outputGain;
     
     Filter filter;
-    juce::AudioProcessorValueTreeState apvts;
     SVerb SVerb;
+
+    juce::AudioProcessorValueTreeState apvts;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TourniquetAudioProcessor)
 };

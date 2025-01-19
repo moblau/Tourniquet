@@ -147,26 +147,49 @@ void TourniquetAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+    
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
+    
+    inputGain.setGainLinear(juce::Decibels::decibelsToGain(apvts.getRawParameterValue("inputGain")->load()));
+    outputGain.setGainLinear(juce::Decibels::decibelsToGain(apvts.getRawParameterValue("outputGain")->load()));
+    
+    juce::dsp::AudioBlock<float> block(buffer);
+    juce::dsp::ProcessContextReplacing<float> context(block);
+    
+    inputGain.process(context);
+    
+    inRMSLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples())) ;
+    inRMSRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+    
+    auto leftChannel = buffer.getReadPointer(0);
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+    {
+        if (juce::Decibels::gainToDecibels(leftChannel[sample]) > 0 )
+        {
+            inLeftClip = true;
+        }
+        else{
+            inLeftClip = false;
+        }
+    }
+    
+    auto rightChannel = buffer.getReadPointer(1);
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+    {
+        if (juce::Decibels::gainToDecibels(rightChannel[sample]) > 0 )
+        {
+            inRightClip = true;
+        }
+        else{
+            inRightClip = false;
+        }
+    }
+    
     handleMidi(midiMessages);
+    
     dryWet.pushDrySamples(buffer);
     dryWet.setWetMixProportion(*apvts.getRawParameterValue("dryWet"));
-    juce::dsp::AudioBlock<float> block(buffer);
     
     int filterOrder = *apvts.getRawParameterValue("filterOrder");
     if (filterOrder == 0)
@@ -181,14 +204,41 @@ void TourniquetAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         
     }
     
-
-//
     lpfDelta.store(filter.getLpfDelta());
     hpfDelta.store(filter.getHpfDelta());
     lpfFreq.store(*apvts.getRawParameterValue("lowPass"));
     hpfFreq.store(*apvts.getRawParameterValue("highPass"));
-//
+
     dryWet.mixWetSamples(buffer);
+    outputGain.process(context);
+
+    outRMSLeft = juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples())) ;
+    outRMSRight = juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples()));
+
+    leftChannel = buffer.getReadPointer(0);
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+    {
+        if (juce::Decibels::gainToDecibels(leftChannel[sample]) > 0 )
+        {
+            outLeftClip = true;
+        }
+        else{
+            outLeftClip = false;
+        }
+    }
+    
+    rightChannel = buffer.getReadPointer(1);
+    for (int sample = 0; sample < buffer.getNumSamples(); sample++)
+    {
+        if (juce::Decibels::gainToDecibels(rightChannel[sample]) > 0 )
+        {
+            outRightClip = true;
+        }
+        else{
+            outRightClip = false;
+        }
+    }
+    
 }
 
 //==============================================================================
@@ -247,8 +297,6 @@ void TourniquetAudioProcessor::handleMidi(juce::MidiBuffer& midiMessages)
         {
             filter.endNote();
         }
-
-        
     }
 }
 
@@ -258,10 +306,10 @@ juce::AudioProcessorValueTreeState::ParameterLayout TourniquetAudioProcessor::cr
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> parameters;
     parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID("delay",1),"delay",0,2500,0));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("feedback",1),"feedback",0.0,1.0,0.0));
-    for ( int i = 0; i < 3; i++){
-        auto paramName = "allPassDelay" + juce::String(i);
-        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID(paramName,1),paramName,0.0,44100.0,1.0));
-    }
+//    for ( int i = 0; i < 3; i++){
+//        auto paramName = "allPassDelay" + juce::String(i);
+//        parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID(paramName,1),paramName,0.0,44100.0,1.0));
+//    }
     parameters.push_back(std::make_unique<juce::AudioParameterInt>(juce::ParameterID("distortion",1),"distortion",1,99,1));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("lowPass",1),"lowPass",juce::NormalisableRange<float>(20, 20000, .1, 1),20000));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("highPass",1),"highPass",juce::NormalisableRange<float>(20, 20000, .1, 1),20));
@@ -282,6 +330,8 @@ juce::AudioProcessorValueTreeState::ParameterLayout TourniquetAudioProcessor::cr
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("hpfEnvRelease",1),"hpfEnvRelease",0,3,1));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("lpfSkew",1),"lpfSkew",.1,1,1));
     parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("hpfSkew",1),"hpfSkew",.1,1,1));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("inputGain",1),"inputGain",juce::NormalisableRange<float>(-100, 24, .1, 1),0));
+    parameters.push_back(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID("outputGain",1),"outputGain",juce::NormalisableRange<float>(-100, 24, .1, 1),0));
     
     return {parameters.begin(), parameters.end()};
     

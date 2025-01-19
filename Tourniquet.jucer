@@ -14,6 +14,7 @@
       <FILE id="QKXaNE" name="tourniquet2.png" compile="0" resource="1" file="graphics/tourniquet2.png"/>
     </GROUP>
     <GROUP id="{2E4C336B-62E2-F877-6DAD-DE41B6C4E4B7}" name="Source">
+      <FILE id="jRzUI9" name="Meter.cpp" compile="1" resource="0" file="Source/Meter.cpp"/>
       <FILE id="XIayz6" name="VerticalLabel.h" compile="0" resource="0" file="Source/VerticalLabel.h"/>
       <FILE id="vmnrt2" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -33,6 +34,7 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="jPat2n" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="XWt6xk" name="Meter.h" compile="0" resource="0" file="Source/Meter.h"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
@@ -55,7 +57,8 @@
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" targetName="Tourniquet"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="Tourniquet"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Tourniquet" enablePluginBinaryCopyStep="1"
+                       osxArchitecture="64BitIntel"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../JUCE/modules"/>
