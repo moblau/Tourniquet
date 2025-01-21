@@ -29,7 +29,7 @@ void SVerb::prepare(double sampleRate, int samplesPerBlock){
     cfDelay2 = (int)(1601);
     cfDelay3 = (int)(2053);
     cfDelay4 = (int)(2251);
-//
+
     line1.prepare(spec);
     line1.reset();
     line1.setMaximumDelayInSamples(sampleRate*4);
@@ -88,7 +88,6 @@ float SVerb::process(juce::AudioBuffer<float>& buffer, std::atomic<float> * dela
             
             delayCaptured = delayTime->load();
             feedbackCaptured = feedback->load();
-//            float a= feedbackCaptured;
             line1.setDelay(apDelay1+delayCaptured);
             line2.setDelay(apDelay2+delayCaptured*(1+feedbackCaptured));
             line3.setDelay(apDelay3+delayCaptured*(3+feedbackCaptured*3));
@@ -101,14 +100,7 @@ float SVerb::process(juce::AudioBuffer<float>& buffer, std::atomic<float> * dela
             
             float a=.62;
             
-//            readIndex0 = writeIndex0 - apDelay1;
-            
-//            if ( readIndex0 < 0){
-//                readIndex0+= apf0delayLine.getNumSamples();
-//            }
-//
-//            float v_delayed = apf0delayLine.getSample(channel, writeIndex0);
-//            DBG("read " << readIndex0 << " " << v_delayed);
+
             float v_delayed = line1.popSample(channel);
             float output = a*inputSample + v_delayed;
             float new_v = inputSample - a*v_delayed;
@@ -119,7 +111,6 @@ float SVerb::process(juce::AudioBuffer<float>& buffer, std::atomic<float> * dela
             output = a*output + v_delayed;
             new_v = temp - a*v_delayed;
             line2.pushSample(channel, new_v);
-//
             temp = output;
             v_delayed = line3.popSample(channel);
             output = a*output + v_delayed;
