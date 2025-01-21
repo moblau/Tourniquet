@@ -15,15 +15,7 @@ SVerb::SVerb(juce::AudioProcessorValueTreeState& apvts) : params(apvts), distort
     
 }
 void SVerb::prepare(double sampleRate, int samplesPerBlock){
-    
-//    apDelay1 = (int) (0.347*sampleRate*44/25);
-//    apDelay2 = (int) (0.113*sampleRate*44/25);
-//    apDelay3 = (int) (0.37*sampleRate*44/25);
-//
-//    cfDelay1 = (int) (1.687*sampleRate*44/25);
-//    cfDelay2 = (int) (1.601*sampleRate*44/25);
-//    cfDelay3 = (int) (2.053*sampleRate*44/25);
-//    cfDelay4 = (int) (2.251*sampleRate*44/25);
+
     juce::dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
@@ -66,57 +58,7 @@ void SVerb::prepare(double sampleRate, int samplesPerBlock){
     line7.reset();
     line7.setMaximumDelayInSamples(sampleRate*4);
 
-//    cfDelay1 = (int)(20000);
-//    cfDelay2 = (int)(11200);
-//    cfDelay3 = (int)(13700);
-//    cfDelay4 = (int)(9100);
-//    writeIndex0 = 0;
-//    writeIndex1 = 0;
-//    writeIndex2 = 0;
-//    writeIndex3 = 0;
-//    writeIndex4 = 0;
-//    writeIndex5 = 0;
-//    writeIndex6 = 0;
-////    this->sampleRate = sampleRate;
-//    apf0delayLine.setSize(2, apDelay1);
-//    apf0delayLine.clear();
-//
-//
-//    apf1delayLine.setSize(2, apDelay2);
-//    apf1delayLine.clear();
-//
-//    apf2delayLine.setSize(2, apDelay3);
-//    apf2delayLine.clear();
-//
-//
-//
-//    cf3delayLine.setSize(2, cfDelay1);
-//    cf3delayLine.clear();
-//    cf4delayLine.setSize(2, cfDelay2);
-//    cf4delayLine.clear();
-//    cf5delayLine.setSize(2, cfDelay3);
-//    cf5delayLine.clear();
-//    cf6delayLine.setSize(2, cfDelay4);
-//    cf6delayLine.clear();
 
-    
-    
-//    juce::dsp::ProcessSpec spec;
-//    spec.sampleRate = sampleRate;
-//    spec.maximumBlockSize = samplesPerBlock;
-//    spec.numChannels = 2;
-//
-//    apf0.prepare(spec);
-//    apf0.reset();
-//    apf0.setMaximumDelayInSamples(sampleRate);
-//
-//    apf1.prepare(spec);
-//    apf1.reset();
-//    apf1.setMaximumDelayInSamples(sampleRate);
-//
-//    apf2.prepare(spec);
-//    apf2.reset();
-//    apf2.setMaximumDelayInSamples(sampleRate);
 }
 
 void SVerb::setParams(float delayTimeMs, float feedback, int allPassDelay0,int allPassDelay1,int allPassDelay2){
